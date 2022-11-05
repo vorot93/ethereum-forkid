@@ -2,7 +2,7 @@
 #![allow(clippy::redundant_else, clippy::too_many_lines)]
 #![doc = include_str!("../README.md")]
 
-use crc::crc32;
+use crc::{Crc, CRC_32_ISO_HDLC};
 use fastrlp::*;
 use maplit::btreemap;
 use primitive_types::H256;
@@ -29,16 +29,19 @@ pub type BlockNumber = u64;
 )]
 pub struct ForkHash(pub [u8; 4]);
 
+const CRC: Crc<u32> = Crc::<u32>::new(&CRC_32_ISO_HDLC);
+
 impl From<H256> for ForkHash {
     fn from(genesis: H256) -> Self {
-        Self(crc32::checksum_ieee(&genesis[..]).to_be_bytes())
+        Self(CRC.checksum(&genesis[..]).to_be_bytes())
     }
 }
 
 impl AddAssign<BlockNumber> for ForkHash {
     fn add_assign(&mut self, block: BlockNumber) {
-        let blob = block.to_be_bytes();
-        self.0 = crc32::update(u32::from_be_bytes(self.0), &crc32::IEEE_TABLE, &blob).to_be_bytes();
+        let mut digest = CRC.digest_with_initial(u32::from_be_bytes(self.0));
+        digest.update(&block.to_be_bytes());
+        self.0 = digest.finalize().to_be_bytes();
     }
 }
 
