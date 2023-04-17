@@ -13,8 +13,8 @@ edition = "2021"
 crc = "1"
 maplit = "1"
 primitive-types = { version = "0.12", default-features = false }
-fastrlp = { version = "0.2", features = ["derive"] }
+fastrlp = { version = "0.3", features = ["derive"] }
 thiserror = "1"
 
 [dev-dependencies]
-hex-literal = "0.3"
+hex-literal = "0.4"

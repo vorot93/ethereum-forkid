@@ -3,7 +3,6 @@
 #![doc = include_str!("../README.md")]
 
 use crc::crc32;
-use fastrlp::*;
 use maplit::btreemap;
 use primitive_types::H256;
 use std::{
@@ -23,9 +22,9 @@ pub type BlockNumber = u64;
     PartialEq,
     Eq,
     Hash,
-    RlpEncodableWrapper,
-    RlpDecodableWrapper,
-    RlpMaxEncodedLen,
+    fastrlp::EncodableWrapper,
+    fastrlp::DecodableWrapper,
+    fastrlp::MaxEncodedLen,
 )]
 pub struct ForkHash(pub [u8; 4]);
 
@@ -52,7 +51,17 @@ impl Add<BlockNumber> for ForkHash {
 
 /// A fork identifier as defined by EIP-2124.
 /// Serves as the chain compatibility identifier.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, RlpEncodable, RlpDecodable, RlpMaxEncodedLen)]
+#[derive(
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    fastrlp::Encodable,
+    fastrlp::Decodable,
+    fastrlp::MaxEncodedLen,
+)]
 pub struct ForkId {
     /// CRC32 checksum of the all fork blocks from genesis.
     pub hash: ForkHash,
@@ -463,21 +472,26 @@ mod tests {
         );
 
         assert_eq!(
-            ForkId::decode(&mut (&hex!("c6840000000080") as &[u8])).unwrap(),
+            <ForkId as fastrlp::Decodable>::decode(&mut (&hex!("c6840000000080") as &[u8]))
+                .unwrap(),
             ForkId {
                 hash: ForkHash(hex!("00000000")),
                 next: 0
             }
         );
         assert_eq!(
-            ForkId::decode(&mut (&hex!("ca84deadbeef84baddcafe") as &[u8])).unwrap(),
+            <ForkId as fastrlp::Decodable>::decode(&mut (&hex!("ca84deadbeef84baddcafe") as &[u8]))
+                .unwrap(),
             ForkId {
                 hash: ForkHash(hex!("deadbeef")),
                 next: 0xBADD_CAFE
             }
         );
         assert_eq!(
-            ForkId::decode(&mut (&hex!("ce84ffffffff88ffffffffffffffff") as &[u8])).unwrap(),
+            <ForkId as fastrlp::Decodable>::decode(
+                &mut (&hex!("ce84ffffffff88ffffffffffffffff") as &[u8])
+            )
+            .unwrap(),
             ForkId {
                 hash: ForkHash(hex!("ffffffff")),
                 next: u64::max_value()
