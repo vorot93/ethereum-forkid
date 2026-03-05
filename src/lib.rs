@@ -296,7 +296,7 @@ mod tests {
         assert_eq!(
             filter.validate(ForkId {
                 hash: ForkHash(hex!("668db0af")),
-                next: BlockNumber::max_value()
+                next: BlockNumber::MAX
             }),
             Ok(())
         );
@@ -332,7 +332,7 @@ mod tests {
         assert_eq!(
             filter.validate(ForkId {
                 hash: ForkHash(hex!("a00bc324")),
-                next: BlockNumber::max_value()
+                next: BlockNumber::MAX
             }),
             Ok(())
         );
@@ -466,7 +466,7 @@ mod tests {
         assert_eq!(
             &*fastrlp::encode_fixed_size(&ForkId {
                 hash: ForkHash(hex!("ffffffff")),
-                next: u64::max_value()
+                next: u64::MAX
             }),
             hex!("ce84ffffffff88ffffffffffffffff")
         );
@@ -494,7 +494,7 @@ mod tests {
             .unwrap(),
             ForkId {
                 hash: ForkHash(hex!("ffffffff")),
-                next: u64::max_value()
+                next: u64::MAX
             }
         );
     }
